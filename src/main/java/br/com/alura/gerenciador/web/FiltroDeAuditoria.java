@@ -1,7 +1,6 @@
 package br.com.alura.gerenciador.web;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -12,6 +11,10 @@ import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import br.com.alura.gerenciador.Usuario;
 
 @WebFilter(urlPatterns="/*")
 public class FiltroDeAuditoria implements Filter {
@@ -27,12 +30,16 @@ public class FiltroDeAuditoria implements Filter {
 			throws IOException, ServletException {
 		
 		HttpServletRequest req = (HttpServletRequest) request;
-		String usuario = "<deslogado>";
-		Cookie cookie = getUsuario(req);
+		HttpServletResponse resp = (HttpServletResponse) response;
+		HttpSession session = req.getSession();
+		Usuario usuarioLogado = (Usuario) session.getAttribute("usuario.logado");
 		
-		if(cookie != null) 
-			usuario = cookie.getValue();
-	
+		String usuario = "<deslogado>";
+		
+		if(usuarioLogado != null) {
+			usuario = usuarioLogado.getEmail();
+		}
+			
 		System.out.println("O LeonnyLino estar acessando com usuario: "+usuario+" na URI: "+req.getRequestURI());
 		
 		chain.doFilter(request, response);
